@@ -8,10 +8,12 @@ import urllib3
 #mp3 or flac?
 #flac + cualité -> ocupa mes
 StorageFolder="/tmp/"
-
 class parseData:
     def __init__(self,StoragePath=None,url=None,word=None):
-        self.StoragePath=StoragePath
+        if word is None:
+            self.StoragePath = StoragePath
+        else:
+            self.StoragePath=StoragePath+word+"/"
         self.url=url
         self.word=word
 
@@ -26,7 +28,8 @@ class parseData:
             lastLink = None
             AlbumTitle = album.find('h2').contents[0]
             if not os.path.isdir((self.StoragePath+AlbumTitle)):
-                os.mkdir(self.StoragePath+AlbumTitle)
+                # os.mkdir(self.StoragePath+AlbumTitle)
+                os.makedirs(self.StoragePath+AlbumTitle,exist_ok=True)
             print('>', AlbumTitle)
             #Descarregar mp3
             for link in album.findAll('a'):
