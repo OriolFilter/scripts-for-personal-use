@@ -67,7 +67,8 @@ class parseData:
                     # print(link.contents[0])
                     sanitizedLink = str(link.contents[0]).lower().replace(" ", "").replace("-", "").replace("_","").replace(",", "")
                     if sanitizedName in sanitizedLink:
-                        self.getAlbum("https://downloads.khinsider.com/" + link.get('href'))
+                        self.url="https://downloads.khinsider.com/" + link.get('href')
+                        self.getAlbum()
 
     def downloadFile(self,url,album=None):
         downloadPath=self.StoragePath+album+"/"+os.path.basename(url)
@@ -126,7 +127,7 @@ if webpage is 1:
         item.getAlbum()
     elif action is 2:
         print('Introduce the word to filter')
-        word = 'guilty-gear'
+        word = input()
         item = parseData(StoragePath=StorageFolder,url="https://downloads.khinsider.com/game-soundtracks/browse/" + word[0].upper(), word=word,)
         item.searchAlbum()
     else:
