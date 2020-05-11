@@ -124,7 +124,7 @@ if webpage is 1:
         url = input()
         item = parseData(StoragePath=StorageFolder, url=url, word=None)
         item.getAlbum()
-    elif input is 2:
+    elif action is 2:
         print('Introduce the word to filter')
         word = 'guilty-gear'
         item = parseData(StoragePath=StorageFolder,url="https://downloads.khinsider.com/game-soundtracks/browse/" + word[0].upper(), word=word,)
