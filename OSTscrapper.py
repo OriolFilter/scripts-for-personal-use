@@ -74,7 +74,7 @@ class parseData:
                         self.getAlbum()
 
     def downloadFile(self,url,album=None):
-        downloadPath=''.join([self.StoragePath,album,"/",os.path.basename(url)]).replace("%20"," ")
+        downloadPath=''.join([self.StoragePath,album,"/",os.path.basename(url)]).replace("%2C",",").replace("%20"," ").replace("%21","!").replace("%26","&").replace("%27","'").replace("%28","(").replace("%29",")").replace("%E3%83%BB","・").replace("%EF%BC%8F","／")
         http = urllib3.PoolManager()
         file = http.request('GET',url,preload_content=False)
         with open(downloadPath, 'wb') as out:
