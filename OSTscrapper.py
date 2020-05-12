@@ -28,9 +28,9 @@ class parseData:
             album = BeautifulSoup(html_page.data, 'html.parser')
             lastLink = None
             AlbumTitle = album.find('h2').contents[0]
-            if not os.path.isdir((''.join[self.StoragePath,AlbumTitle])):
+            if not os.path.isdir(''.join([self.StoragePath,AlbumTitle])):
                 # os.mkdir(self.StoragePath+AlbumTitle)
-                os.makedirs(''.join[self.StoragePath,AlbumTitle],exist_ok=True)
+                os.makedirs(''.join([self.StoragePath,AlbumTitle]),exist_ok=True)
             print('>', AlbumTitle)
             #Descarregar mp3
             for link in album.findAll('a'):
@@ -42,7 +42,6 @@ class parseData:
                         # AconseguirElLinkDelMP3
                         mp3PageHtml = http.request('GET',''.join(["https://downloads.khinsider.com",link.get('href')]))
                         mp3PageHtmlContent = BeautifulSoup(mp3PageHtml.data, 'html.parser')
-
                         downloadButtons = mp3PageHtmlContent.find_all('span', class_='songDownloadLink')
                         for file in downloadButtons:
                             if file is None: pass
