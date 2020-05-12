@@ -8,12 +8,13 @@ import urllib3
 #mp3 or flac?
 #flac + cualité -> ocupa mes
 StorageFolder="/tmp/"
+AdditionalWord=" OST"
 class parseData:
-    def __init__(self,StoragePath=None,url=None,word=None):
+    def __init__(self,StoragePath=None,url=None,word=None,additionalWord=None):
         if word is None:
-            self.StoragePath = StoragePath
+            self.StoragePath = ''.join([StoragePath,"/"])
         else:
-            self.StoragePath=StoragePath+word+"/"
+            self.StoragePath=''.join([StoragePath,word,AdditionalWord,"/"])
         self.url=url
         self.word=word
 
@@ -27,9 +28,9 @@ class parseData:
             album = BeautifulSoup(html_page.data, 'html.parser')
             lastLink = None
             AlbumTitle = album.find('h2').contents[0]
-            if not os.path.isdir((self.StoragePath+AlbumTitle)):
+            if not os.path.isdir((''.join[self.StoragePath,AlbumTitle])):
                 # os.mkdir(self.StoragePath+AlbumTitle)
-                os.makedirs(self.StoragePath+AlbumTitle,exist_ok=True)
+                os.makedirs(''.join[self.StoragePath,AlbumTitle],exist_ok=True)
             print('>', AlbumTitle)
             #Descarregar mp3
             for link in album.findAll('a'):
@@ -39,7 +40,7 @@ class parseData:
                     elif link.get('href').startswith('/') and link.get('href').endswith('.mp3'):
                         # print(link.get('href'))
                         # AconseguirElLinkDelMP3
-                        mp3PageHtml = http.request('GET',"https://downloads.khinsider.com" + link.get('href'))
+                        mp3PageHtml = http.request('GET',''.join(["https://downloads.khinsider.com",link.get('href')]))
                         mp3PageHtmlContent = BeautifulSoup(mp3PageHtml.data, 'html.parser')
 
                         downloadButtons = mp3PageHtmlContent.find_all('span', class_='songDownloadLink')
@@ -70,11 +71,11 @@ class parseData:
                     # print(link.contents[0])
                     sanitizedLink = str(link.contents[0]).lower().replace(" ", "").replace("-", "").replace("_","").replace(",", "")
                     if sanitizedName in sanitizedLink:
-                        self.url="https://downloads.khinsider.com/" + link.get('href')
+                        self.url=''.join(["https://downloads.khinsider.com/",link.get('href')])
                         self.getAlbum()
 
     def downloadFile(self,url,album=None):
-        downloadPath=self.StoragePath+album+"/"+os.path.basename(url)
+        downloadPath=''.join([self.StoragePath,album,"/",os.path.basename(url)]).replace("%20"," ")
         http = urllib3.PoolManager()
         file = http.request('GET',url,preload_content=False)
         with open(downloadPath, 'wb') as out:
@@ -111,13 +112,13 @@ Opcions2={
 print("Selecciona una d'aquestes opcions")
 
 for opcions in Opcions1:
-    print(str(opcions)+" "+str(Opcions1[opcions]['source']))
+    print(''.join([str(opcions)," ",str(Opcions1[opcions]['source'])]))
 webpage=int(input())
 
 print("Selecciona una d'aquestes opcions")
 
 for opcions in Opcions2[Opcions1[webpage]["link"]]:
-    print(str(opcions)+" "+str(Opcions2[Opcions1[webpage]["link"]][opcions]))
+    print(''.join([str(opcions)," ",str(Opcions2[Opcions1[webpage]["link"]][opcions])]))
 action=int(input())
 
 
@@ -129,9 +130,9 @@ if webpage is 1:
         item = parseData(StoragePath=StorageFolder, url=url, word=None)
         item.getAlbum()
     elif action is 2:
-        print('Introduce the word to filter')
+        print('Introduce the word to filter (the input will also be used to create a folder to put the items)')
         word = input()
-        item = parseData(StoragePath=StorageFolder,url="https://downloads.khinsider.com/game-soundtracks/browse/" + word[0].upper(), word=word,)
+        item = parseData(StoragePath=StorageFolder,url=''.join(["https://downloads.khinsider.com/game-soundtracks/browse/",word[0].upper()]), word=word,additionalWord=AdditionalWord)
         item.searchAlbum()
     else:
         print('Wrong input!')
