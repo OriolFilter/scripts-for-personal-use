@@ -8,6 +8,10 @@ from selenium import webdriver
 driverFolder=str(pathlib.Path(__file__).parent)+"scrappers/+driversFolder"
 firefox64b=driverFolder + '/geckodriver64x'
 firefox64b=driverFolder + '/geckodriver32x' #NoEsta
+
+
+storingFolder='/tmp'
+
 class downloadManager:
     def __init__(self):pass
 
@@ -67,18 +71,23 @@ class parseData:
         if html_page.status is 200:
             parser = BeautifulSoup(html_page.data, 'html.parser')
             # print(parser)
-            self.aviableContainers=[]
+            self.aviableContainersList=[]
+            x=0
             for element in parser.findAll('figure'):
-                self.aviableContainers.append(element.findParent())
-
+                self.aviableContainersList.append([[]])
+                self.aviableContainersList[x][0]=element.findParent().find('span').contents[0]
+                self.aviableContainersList[x].append(element.findParent().get('title'))
+                x+=1
         html_page.release_conn()
 
     def printElements(self):
         x=0
-        for container in self.aviableContainers:
-            print(str(x)+' '*(3-len(str(x)))+ container.find('span').contents[0],
-                  ' ' * (15 - len(container.find('span').contents[0])), container.get('title'))
+        # print(self.aviableContainersList)
+        for container in self.aviableContainersList:
+            print(str(x)+' '*(3-len(str(x)))+ container[0],
+                  ' ' * (15 - len(container[0])), container[1])
             x += 1
+
 
     def selectElement(self,value):
         #Selecting which 'container' download
@@ -207,7 +216,7 @@ class parseData:
         file.release_conn()
 
 
-optionMenu=2
+optionMenu=1
 
 if optionMenu is 1: #Search by word
     print('Introdueix el nom de la serie a buscar:')
@@ -216,7 +225,7 @@ if optionMenu is 1: #Search by word
     if word is not None and word is not '':
         test=parseData(word=word)
         test.searchElements()
-        if len(test.aviableContainers) > 0:
+        if len(test.aviableContainersList) > 0:
             test.printElements()
             print('\nIntrodueix un nombre per a seleccionar un element')
             elementNumber=int(input())
@@ -241,12 +250,12 @@ elif optionMenu is 2: #Download matching words
     if word is not None and word is not '':
         test=parseData(word=word)
         test.searchElements()
-        if len(test.aviableContainers) > 0:
+        if len(test.aviableContainersList) > 0:
             test.printElements()
             # print('\nIntrodueix un nombre per a seleccionar un element')
             # elementNumber=int(input())
             x=0
-            for element in test.aviableContainers:
+            for element in test.aviableContainersList:
                 dlFolder=test.selectElement(value=x)
                 if dlFolder is not None:
                     test.getDownloadLinkList(dlFolder,type='mega')
