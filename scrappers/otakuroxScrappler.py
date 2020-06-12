@@ -5,15 +5,28 @@ from time import sleep
 import pathlib
 from selenium import webdriver
 
-driverFolder=str(pathlib.Path(__file__).parent)+"scrappers/+driversFolder"
+driverFolder=str(pathlib.Path(__file__).parent)+"/driversFolder"
 firefox64b=driverFolder + '/geckodriver64x'
-firefox64b=driverFolder + '/geckodriver32x' #NoEsta
+firefox32b=driverFolder + '/geckodriver32x' #NoEsta
 
 
-storingFolder='/tmp'
-
+storingFolder='/tmp/animuTest/'
 class downloadManager:
-    def __init__(self):pass
+    def __init__(self,albumName,dlLink):
+        print(albumName)
+        self.albumName=albumName.replace('\\',' ').replace('/',' ')
+        self.dlLink=dlLink
+
+
+    def createFolder(self):
+        try:
+            os.mkdir(storingFolder+self.albumName)
+        except OSError as e:print(e)
+
+    def downloadMega(self):
+        file = open(storingFolder+self.albumName+"/link", "w")
+        file.write(self.dlLink)
+        file.close()
 
 class shortener:
     def __init__(self,link):
@@ -33,7 +46,7 @@ class shortener:
 
     def ouo(self):
         # print('ouo')
-        print(self.dllink)
+        # print(self.dllink)
         web = webdriver.Firefox(executable_path=firefox64b)
         web.get(self.dllink)
         sleep(3)
@@ -77,6 +90,7 @@ class parseData:
                 self.aviableContainersList.append([[]])
                 self.aviableContainersList[x][0]=element.findParent().find('span').contents[0]
                 self.aviableContainersList[x].append(element.findParent().get('title'))
+                self.aviableContainersList[x].append(element.findParent().get('href'))
                 x+=1
         html_page.release_conn()
 
@@ -91,7 +105,8 @@ class parseData:
 
     def selectElement(self,value):
         #Selecting which 'container' download
-        return self.getDownloadLinkFolder('www.otakurox.com'+self.aviableContainers[value].get('href'))
+        self.albumName=self.aviableContainersList[value][1]
+        return self.getDownloadLinkFolder('www.otakurox.com'+self.aviableContainersList[value][2])
 
     def getDownloadLinkFolder(self,dlLink):
         link=None
@@ -147,7 +162,6 @@ class parseData:
     def selectDownloadOption(self,value):
         #Selecting which 'Download List' download
         return self.aviableDownloadLinkList[value][5]
-
 
 
     def getAlbum(self):
@@ -216,6 +230,8 @@ class parseData:
         file.release_conn()
 
 
+
+
 optionMenu=1
 
 if optionMenu is 1: #Search by word
@@ -223,22 +239,25 @@ if optionMenu is 1: #Search by word
     word=input()
     # word='Ao no Exorcist'
     if word is not None and word is not '':
-        test=parseData(word=word)
-        test.searchElements()
-        if len(test.aviableContainersList) > 0:
-            test.printElements()
+        parse=parseData(word=word)
+        parse.searchElements()
+        if len(parse.aviableContainersList) > 0:
+            parse.printElements()
             print('\nIntrodueix un nombre per a seleccionar un element')
             elementNumber=int(input())
-            dlFolder=test.selectElement(value=elementNumber)
-            test.getDownloadLinkList(dlFolder,type='mega')
-            if len(test.aviableDownloadLinkList) > 0:
-                test.printDownloadLinkList()
+            dlFolder=parse.selectElement(value=elementNumber)
+            parse.getDownloadLinkList(dlFolder,type='mega')
+            if len(parse.aviableDownloadLinkList) > 0:
+                parse.printDownloadLinkList()
                 print('\nIntrodueix un nombre per a seleccionar un element')
                 elementNumber=int(input())
-                dlLink = test.selectDownloadOption(value=elementNumber)
+                dlLink = parse.selectDownloadOption(value=elementNumber)
                 dlManagerLink = shortener(link=dlLink)
-                print(dlManagerLink.getShortenedLink())
-                # print(test.getDownloadLinkFolder(dlLink='http://www.otakurox.com/info/anime/416/ao-no-exorcist'))
+                dlManagerLink.getShortenedLink()
+                parse2=downloadManager(albumName=parse.albumName,dlLink=dlManagerLink.downloadLink)
+                parse2.createFolder()
+                parse2.downloadMega()
+                # print(parse.getDownloadLinkFolder(dlLink='http://www.otakurox.com/info/anime/416/ao-no-exorcist'))
             else: print('No s\'ha pogut trobar cap element amb l\'opcio seleccionada')
         else: print('No s\'ha pogut trobar cap element amb el nom introduït')
         #pot mostrar un màxim de 63 elements??
@@ -248,31 +267,34 @@ elif optionMenu is 2: #Download matching words
     word=input()
     # word='Ao no Exorcist'
     if word is not None and word is not '':
-        test=parseData(word=word)
-        test.searchElements()
-        if len(test.aviableContainersList) > 0:
-            test.printElements()
+        parse=parseData(word=word)
+        parse.searchElements()
+        if len(parse.aviableContainersList) > 0:
+            parse.printElements()
             # print('\nIntrodueix un nombre per a seleccionar un element')
             # elementNumber=int(input())
             x=0
-            for element in test.aviableContainersList:
-                dlFolder=test.selectElement(value=x)
+            for element in parse.aviableContainersList:
+                dlFolder=parse.selectElement(value=x)
                 if dlFolder is not None:
-                    test.getDownloadLinkList(dlFolder,type='mega')
-                    test.printDownloadLinkList()
-                    # if len(test.aviableDownloadLinkList) > 0:
-                    #     test.printDownloadLinkList()
-                    #     print('\nIntrodueix un nombre per a seleccionar un element')
-                    #     elementNumber=int(input())
-                    #     dlLink = test.selectDownloadOption(value=elementNumber)
-                    #     dlManagerLink = shortener(link=dlLink)
-                    #     print(dlManagerLink.getShortenedLink())
-                    # else: print('No s\'ha pogut trobar cap element amb l\'opcio seleccionada')
+                    print(parse.albumName)
+                    parse.getDownloadLinkList(dlFolder,type='mega')
+                    # parse.printDownloadLinkList()
+                    if len(parse.aviableDownloadLinkList) > 0:
+                        # parse.printDownloadLinkList()
+                        elementNumber = 0
+                        dlLink = parse.selectDownloadOption(value=elementNumber)
+                        dlManagerLink = shortener(link=dlLink)
+                        dlManagerLink.getShortenedLink()
+                        parse2 = downloadManager(album=parse.albumName, dlLink=parse.downloadLink)
+                        parse2.createFolder()
+                        parse2.downloadMega()
+                    else: print('No s\'ha pogut trobar cap element amb l\'opcio seleccionada')
                 else: print('No s\'ha pogut trobar cap element amb l\'opcio seleccionada')
                 x+=1
 
 
-                # print(test.getDownloadLinkFolder(dlLink='http://www.otakurox.com/info/anime/416/ao-no-exorcist'))
+                # print(parse.getDownloadLinkFolder(dlLink='http://www.otakurox.com/info/anime/416/ao-no-exorcist'))
         else: print('No s\'ha pogut trobar cap element amb el nom introduït')
         #pot mostrar un màxim de 63 elements??
     else: print('Has d\'introduïr algo')
