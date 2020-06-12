@@ -81,6 +81,7 @@ class parseData:
 
     def selectElement(self,value):
         #Selecting which 'container' download
+        print(self.aviableContainers[value].get('href'))
         return self.getDownloadLinkFolder('www.otakurox.com'+self.aviableContainers[value].get('href'))
 
     def getDownloadLinkFolder(self,dlLink):
@@ -99,29 +100,30 @@ class parseData:
         html_page.release_conn()
         return link
 
-    def getDownloadLinkList(self,dlLink):
+    def getDownloadLinkList(self,dlLink,type=None):
         link=None
         http = urllib3.PoolManager()
         html_page = http.request('GET', dlLink)
         if html_page.status is 200:
             parser = BeautifulSoup(html_page.data, 'html.parser')
-            # print(parser)
             self.aviableDownloadLinkList = []
-            #Ej [[nº Eps],[mega/mediafire],[lang],[uploader],[quality],[link]]
             table = parser.find(id='ddtt').find('tbody')
-            # print('>',table.contents)
             x=0
             for tr in table.findAll('tr'):
                 tdList=tr.findAll('td')
-                self.aviableDownloadLinkList.append([[]])
-                self.aviableDownloadLinkList[x][0]=(tdList[0].contents[0])
-                self.aviableDownloadLinkList[x].append(tdList[1].find('span').contents[0])
-                self.aviableDownloadLinkList[x].append(tdList[2].find('span').contents[0])
-                self.aviableDownloadLinkList[x].append(tdList[5].find('a').contents[0])
-                self.aviableDownloadLinkList[x].append(tdList[6].contents[0])
-                if tdList[len(tdList)-2].contents[0].get('href')[0] is '/': self.aviableDownloadLinkList[x].append('http://www.otakurox.com'+tdList[len(tdList)-2].contents[0].get('href'))
-                else:self.aviableDownloadLinkList[x].append(tdList[len(tdList)-2].contents[0].get('href'))
-                x+=1
+                if (type is 'mega' and tdList[1].find('span').contents[0].lower() == 'mega') or (type is None):
+                    self.aviableDownloadLinkList.append([[]])
+                    self.aviableDownloadLinkList[x][0]=(tdList[0].contents[0])
+                    self.aviableDownloadLinkList[x].append(tdList[1].find('span').contents[0])
+                    self.aviableDownloadLinkList[x].append(tdList[2].find('span').contents[0])
+                    self.aviableDownloadLinkList[x].append(tdList[5].find('a').contents[0])
+                    self.aviableDownloadLinkList[x].append(tdList[6].contents[0])
+                    if tdList[len(tdList)-2].contents[0].get('href')[0] is '/': self.aviableDownloadLinkList[x].append('http://www.otakurox.com'+tdList[len(tdList)-2].contents[0].get('href'))
+                    else:self.aviableDownloadLinkList[x].append(tdList[len(tdList)-2].contents[0].get('href'))
+                    x += 1
+
+
+
         html_page.release_conn()
         return link
 
@@ -205,7 +207,9 @@ class parseData:
         file.release_conn()
 
 
-if 1 is 1: #Search by word
+optionMenu=1
+
+if optionMenu is 1: #Search by word
     print('Introdueix el nom de la serie a buscar:')
     word=input()
     # word='Ao no Exorcist'
@@ -217,8 +221,8 @@ if 1 is 1: #Search by word
             print('\nIntrodueix un nombre per a seleccionar un element')
             elementNumber=int(input())
             dlFolder=test.selectElement(value=elementNumber)
-            test.getDownloadLinkList(dlFolder)
-            if len(test.aviableContainers) > 0:
+            test.getDownloadLinkList(dlFolder,type='mega')
+            if len(test.aviableDownloadLinkList) > 0:
                 test.printDownloadLinkList()
                 print('\nIntrodueix un nombre per a seleccionar un element')
                 elementNumber=int(input())
@@ -227,6 +231,40 @@ if 1 is 1: #Search by word
                 print(dlManagerLink.getShortenedLink())
                 # print(test.getDownloadLinkFolder(dlLink='http://www.otakurox.com/info/anime/416/ao-no-exorcist'))
             else: print('No s\'ha pogut trobar cap element amb l\'opcio seleccionada')
+        else: print('No s\'ha pogut trobar cap element amb el nom introduït')
+        #pot mostrar un màxim de 63 elements??
+    else: print('Has d\'introduïr algo')
+elif optionMenu is 2: #Download matching words
+    print('Introdueix el nom per a filtrar i descarregar els que coincideixin:')
+    word=input()
+    # word='Ao no Exorcist'
+    if word is not None and word is not '':
+        test=parseData(word=word)
+        test.searchElements()
+        if len(test.aviableContainers) > 0:
+            test.printElements()
+            # print('\nIntrodueix un nombre per a seleccionar un element')
+            # elementNumber=int(input())
+            x=0
+            for element in test.aviableContainers:
+                dlFolder=test.selectElement(value=x)
+                if dlFolder is not None:
+                    print(dlFolder)
+                    test.getDownloadLinkList(dlFolder,type='mega')
+                    test.printDownloadLinkList()
+                    # if len(test.aviableDownloadLinkList) > 0:
+                    #     test.printDownloadLinkList()
+                    #     print('\nIntrodueix un nombre per a seleccionar un element')
+                    #     elementNumber=int(input())
+                    #     dlLink = test.selectDownloadOption(value=elementNumber)
+                    #     dlManagerLink = shortener(link=dlLink)
+                    #     print(dlManagerLink.getShortenedLink())
+                    # else: print('No s\'ha pogut trobar cap element amb l\'opcio seleccionada')
+                else: print('No s\'ha pogut trobar cap element amb l\'opcio seleccionada')
+                x+=1
+
+
+                # print(test.getDownloadLinkFolder(dlLink='http://www.otakurox.com/info/anime/416/ao-no-exorcist'))
         else: print('No s\'ha pogut trobar cap element amb el nom introduït')
         #pot mostrar un màxim de 63 elements??
     else: print('Has d\'introduïr algo')
