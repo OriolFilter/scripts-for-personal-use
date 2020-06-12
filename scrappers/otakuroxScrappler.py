@@ -5,8 +5,9 @@ from time import sleep
 import pathlib
 from selenium import webdriver
 
-
-
+driverFolder=str(pathlib.Path(__file__).parent)+"scrappers/+driversFolder"
+firefox64b=driverFolder + '/geckodriver64x'
+firefox64b=driverFolder + '/geckodriver32x' #NoEsta
 class downloadManager:
     def __init__(self):pass
 
@@ -16,7 +17,7 @@ class shortener:
         self.downloadLink=None
 
     def getShortenedLink(self):
-        web = webdriver.Firefox(executable_path=(str(pathlib.Path(__file__).parent) + '/geckodriver'))
+        web = webdriver.Firefox(executable_path=firefox64b)
         web.get(self.link)
         sleep(4)
         self.dllink = web.current_url
@@ -29,7 +30,7 @@ class shortener:
     def ouo(self):
         # print('ouo')
         print(self.dllink)
-        web = webdriver.Firefox(executable_path=(str(pathlib.Path(__file__).parent) + '/geckodriver'))
+        web = webdriver.Firefox(executable_path=firefox64b)
         web.get(self.dllink)
         sleep(3)
         web.execute_script("document.forms[0].submit()")
@@ -81,7 +82,6 @@ class parseData:
 
     def selectElement(self,value):
         #Selecting which 'container' download
-        print(self.aviableContainers[value].get('href'))
         return self.getDownloadLinkFolder('www.otakurox.com'+self.aviableContainers[value].get('href'))
 
     def getDownloadLinkFolder(self,dlLink):
@@ -207,7 +207,7 @@ class parseData:
         file.release_conn()
 
 
-optionMenu=1
+optionMenu=2
 
 if optionMenu is 1: #Search by word
     print('Introdueix el nom de la serie a buscar:')
@@ -249,7 +249,6 @@ elif optionMenu is 2: #Download matching words
             for element in test.aviableContainers:
                 dlFolder=test.selectElement(value=x)
                 if dlFolder is not None:
-                    print(dlFolder)
                     test.getDownloadLinkList(dlFolder,type='mega')
                     test.printDownloadLinkList()
                     # if len(test.aviableDownloadLinkList) > 0:
