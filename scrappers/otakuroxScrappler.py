@@ -10,12 +10,20 @@ firefox64b=driverFolder + '/geckodriver64x'
 firefox32b=driverFolder + '/geckodriver32x' #NoEsta
 
 
+# import os
+# os.system()
+#
+#
+#
+#
+
+
 storingFolder='/tmp/animuTest/'
 class downloadManager:
     def __init__(self,albumName,dlLink):
         print(albumName)
-        self.albumName=albumName.replace('\\',' ').replace('/',' ')
-        self.dlLink=dlLink
+        self.albumName:str=albumName.replace('\\',' ').replace('/',' ')
+        self.dlLink:str=dlLink
 
 
     def createFolder(self):
@@ -24,9 +32,16 @@ class downloadManager:
         except OSError as e:print(e)
 
     def downloadMega(self):
+        self.dlLink.replace('/folder/','/#F!').replace('#','!')
         file = open(storingFolder+self.albumName+"/link", "w")
         file.write(self.dlLink)
         file.close()
+
+    def downloadLik(self):
+        pass
+        if 'mega.nz/' in self.dlLink:self.downloadMega()
+        elif 'drive.google.com/' in self.dlLink:pass
+
 
 class shortener:
     def __init__(self,link):
@@ -60,8 +75,8 @@ class shortener:
 
     def adfly(self):pass
 
-class parseData:
-    def __init__(self,StoragePath=None,url=None,word=None,additionalWord=None):
+class parseDataOtakurox:
+    def __init__(self,StoragePath=None,url=None,word=None,mode=0):
 
         self.url=url
         self.word=word
@@ -234,12 +249,21 @@ class parseData:
 
 optionMenu=1
 
-if optionMenu is 1: #Search by word
+# if optionMenu is 1: #Search by word
+#     print('Introdueix el nom de la serie a buscar:')
+#     word = input()
+#     # word='Ao no Exorcist'
+#     if word is not None and word is not '':
+#         parse = parseDataOtakurox(word=word,mode=0)
+#         parse.searchElements()
+
+# elif optionMenu is 1:  # Search by word
+if optionMenu is 1:  # Search by word
     print('Introdueix el nom de la serie a buscar:')
     word=input()
     # word='Ao no Exorcist'
     if word is not None and word is not '':
-        parse=parseData(word=word)
+        parse=parseDataOtakurox(word=word)
         parse.searchElements()
         if len(parse.aviableContainersList) > 0:
             parse.printElements()
@@ -267,7 +291,7 @@ elif optionMenu is 2: #Download matching words
     word=input()
     # word='Ao no Exorcist'
     if word is not None and word is not '':
-        parse=parseData(word=word)
+        parse=parseDataOtakurox(word=word)
         parse.searchElements()
         if len(parse.aviableContainersList) > 0:
             parse.printElements()
