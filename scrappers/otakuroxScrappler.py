@@ -1,3 +1,5 @@
+# Will avoid use Otakurox, since animeflv is more consistent
+
 import os
 from bs4 import BeautifulSoup
 import urllib3
