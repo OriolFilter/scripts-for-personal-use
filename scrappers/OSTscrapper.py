@@ -95,12 +95,9 @@ class parseData:
         http = urllib3.PoolManager()
         html_page = http.request('GET', ''.join(["https://anime.thehylia.com/soundtracks/browse/all"]))
         if html_page.status is 200:
-            # SearchHtml = BeautifulSoup(html_page.data, 'html.parser')
             SearchHtml = BeautifulSoup(html_page.data, 'html.parser').find(id='main').find(attrs={'align':'left'})#.find() # Inside container
             x=0
             list={}
-            # print(SearchHtml)
-            # print(len(SearchHtml.findAll('a')))
 
             for link in (album for album in SearchHtml.findAll('a') if self.wordS in self.sanitizeWord(album.contents[0])):
                 list[x]={"name":link.contents[0],
@@ -115,8 +112,8 @@ class parseData:
                 elif mode is 0:
                     [print('{} : {}'.format(element, list[element]['name'])) for element in list]
                     print('\n\nSelect one option from the list')
-                    # value = int(input()) # D
-                    value = 0
+                    value = int(input())
+                    # value = 0 # D
                     if value >= 0 and value < len(list):
                         # print(value)
                         self.getAlbum_thehyla(list[value]['href'])
@@ -153,32 +150,6 @@ class parseData:
 
             # Descarregar img/covers
             [self.downloadFile(href, album=AlbumTitle) for href in albumImgList]
-
-                # print(href)
-                # print(link)
-            # for link in album.findAll('a'):
-            #     if lastLink != link.get('href'):
-            #         if link.get('href') is None:
-            #             pass
-            #         elif link.get('href').startswith('/') and link.get('href').endswith('.mp3'):
-            #             # print(link.get('href'))
-            #             mp3PageHtml = http.request('GET',link.get('href'))
-            #             mp3PageHtmlContent = BeautifulSoup(mp3PageHtml.data, 'html.parser')
-            #             downloadButtons = mp3PageHtmlContent.find_all('span', class_='songDownloadLink')
-            #             for file in downloadButtons:
-            #                 if file is None:
-            #                     pass
-            #                 else:
-            #                     linkFile = file.find_previous().get('href')
-            #                     # self.downloadFile(linkFile, AlbumTitle)
-            #                     print(linkFile, AlbumTitle)
-            #
-            #             mp3PageHtml.release_conn()
-            #     lastLink = link.get('href')
-            # Descarregar img/covers
-            # contentTable = album.find('table', class_='contentpaneopen')
-            # for img in contentTable.find('table').findAll('img'):
-            #     self.downloadFile(url=img.get('src'), album=AlbumTitle)
         html_page.release_conn()
 
 
@@ -211,15 +182,15 @@ print("Selecciona una d'aquestes opcions")
 
 for opcions in Opcions['text'][0]:
     print(''.join([str(opcions)," ",str(Opcions['text'][0][opcions]['source'])]))
-# webpage=int(input()) # D
-webpage=2
+webpage=int(input())
+# webpage=2 # D
 
 print("Selecciona una d'aquestes opcions")
 
 for opcions in Opcions['actions'][0][Opcions['text'][0][webpage]["link"]]:
     print(''.join([str(opcions)," ",str(Opcions['actions'][0][Opcions['text'][0][webpage]["link"]][opcions])]))
-# action=int(input())
-action=2 # D
+action=int(input())
+# action=2 # D
 
 
 if webpage is 1:
@@ -239,14 +210,14 @@ if webpage is 1:
 elif webpage is 2:
     if action is 1:
         print('Introduce the word to filter (the input will also be used to create a folder to put the items)')
-        # word = input()
-        word = 'Machine Doll wa Kizutsukanai OP Single - Anicca' # D
+        word = input()
+        # word = 'Machine Doll wa Kizutsukanai OP Single - Anicca' # D
         item = parseData(StoragePath=StorageFolder,word=word, additionalWord=AdditionalWord)
         item.searchAlbum_thehylia()
     elif action is 2:
         print('Introduce the word to filter (the input will also be used to create a folder to put the items)')
-        # word = input()
-        word = 'Machine Doll' # D
+        word = input()
+        # word = 'Machine Doll' # D
         item = parseData(StoragePath=StorageFolder, word=word, additionalWord=AdditionalWord)
         item.searchAlbum_thehylia(mode=1)
     else:
